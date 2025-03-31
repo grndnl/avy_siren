@@ -9,7 +9,7 @@ os.makedirs(SAVE_DIR, exist_ok=True)
 
 # Recording parameters
 DURATION = 60  # seconds
-DEVICE = "plughw:2,0"  # adjust based on your 'arecord -l' output
+DEVICE = "plughw:CARD=U0x46d0x81b,DEV=0"
 
 
 def get_filename():
