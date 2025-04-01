@@ -23,20 +23,29 @@ start_time = time.time()
 signal, sr = librosa.load("recordings/audio_2025-04-01_07-26-49.wav", sr=None)
 noise, _ = librosa.load("recordings/audio_2025-04-01_07-27-49.wav", sr=sr)
 
+# crop signal
+start = 5.5
+end = 16.5
+start_sample = int(start * sr)
+end_sample = int(end * sr)
+signal = signal[start_sample:end_sample]
+
+
 # Apply noise reduction
-# reduced = nr.reduce_noise(y=signal, y_noise=noise, sr=sr)
-reduced = nr.reduce_noise(
-    y=signal,
-    y_noise=noise,
-    sr=sr,
-    prop_decrease=0.25,           # Gentle reduction, preserve signal
-    stationary=False,
-    time_mask_smooth_ms=800,      # Match cannon duration smoothing
-    # freq_mask_smooth_hz=43,       # Let low frequencies breathe
-    n_fft=2048,                   # Better low-frequency resolution
-    win_length=2048,
-    hop_length=512
-)
+reduced = nr.reduce_noise(y=signal, y_noise=noise, sr=sr)
+# reduced = nr.reduce_noise(y=signal, sr=sr)
+# reduced = nr.reduce_noise(
+#     y=signal,
+#     y_noise=noise,
+#     sr=sr,
+#     # prop_decrease=0.9,           # Gentle reduction, preserve signal
+#     stationary=False,
+#     time_mask_smooth_ms=500,      # Match cannon duration smoothing
+#     # freq_mask_smooth_hz=43,       # Let low frequencies breathe
+#     # n_fft=2048,                   # Better low-frequency resolution
+#     # win_length=2048,
+#     # hop_length=512
+# )
 
 
 # Save the result
