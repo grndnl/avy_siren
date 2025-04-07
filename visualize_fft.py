@@ -4,10 +4,11 @@ import matplotlib.pyplot as plt
 import os
 
 # === Config ===
-AUDIO_FILE = "recordings/audio_2025-04-01_07-26-49.wav"
+# AUDIO_FILE = "recordings/audio_2025-04-01_07-26-49.wav"
+AUDIO_FILE = "recordings/audio_2025-04-01_12-48-49.wav"
 START_TIME = 0.0     # seconds (cannon should start here)
 DURATION = 59.0       # seconds (chunk length)
-SAMPLERATE = 16000
+SAMPLERATE = 44100
 OUTPUT_FILE = "fft_cannon_plot.png"
 
 

@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 
 # === Config ===
 # AUDIO_FILE = "recordings/audio_2025-04-01_07-26-49.wav"   # ← Update this
-AUDIO_FILE = "recordings/audio_2025-04-01_07-27-49.wav"   # ← Update this
+# AUDIO_FILE = "recordings/audio_2025-04-01_07-27-49.wav"   # ← Update this
+AUDIO_FILE = "recordings/audio_2025-04-01_12-48-49.wav"
 SAMPLERATE = 44100
 CHUNK_DURATION = 0.5  # seconds
 LOW_FREQ_BAND = (30, 80)
