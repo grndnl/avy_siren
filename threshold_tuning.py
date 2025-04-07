@@ -12,7 +12,7 @@ SAMPLERATE = 44100
 CHUNK_DURATION = 0.5  # seconds
 FREQ_RANGE = (30, 80)
 TOLERANCE = 0  # seconds for matching detected vs. true
-THRESHOLDS = np.linspace(20, 100, 50)  # Magnitude thresholds to test
+THRESHOLDS = np.linspace(20, 60, 5)  # Magnitude thresholds to test
 
 # Frequency ranges to try: [(low1, high1), (low2, high2), ...]
 FREQ_RANGES = [
@@ -100,7 +100,7 @@ for freq_range, threshold in product(FREQ_RANGES, THRESHOLDS):
 df = pd.DataFrame(results)
 best = df.sort_values(by="f1", ascending=False).iloc[0]
 
-print(f"\n🎯 Best Config (based on f1, threshold {threshold}):")
+print(f"\n🎯 Best Config (based on f1):")
 print(f"  Frequency band: {best.low_freq}–{best.high_freq} Hz")
 print(f"  Threshold:      {best.threshold:.1f}")
 print(f"  Precision:      {best.precision:.2f}")
@@ -111,16 +111,9 @@ print(f"  F1 Score:       {best.f1:.2f}")
 df.to_csv("freq_band_tuning_results.csv", index=False)
 print("\n📄 Saved all results to freq_band_tuning_results.csv")
 
-# 🎯 Best Config (based on f1, 0.5 threshold):
-#   Frequency band: 30.0–60.0 Hz
-#   Threshold:      60.8
-#   Precision:      0.80
-#   Recall:         0.80
-#   F1 Score:       0.80
-
-# 🎯 Best Config (based on f1, 0 threshold):
-#   Frequency band: 0.0–64.0 Hz
-#   Threshold:      33.1
-#   Precision:      0.29
-#   Recall:         0.80
-#   F1 Score:       0.42
+# 🎯 Best Config (based on f1):
+#   Frequency band: 0.0–128.0 Hz
+#   Threshold:      30.0
+#   Precision:      0.89
+#   Recall:         0.82
+#   F1 Score:       0.85
