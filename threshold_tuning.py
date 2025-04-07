@@ -5,14 +5,13 @@ import librosa
 from sklearn.metrics import precision_score, recall_score, f1_score
 from itertools import product
 
-
 # === Config ===
 AUDIO_FOLDER = "recordings"  # Folder with .wav files
 GROUND_TRUTH_CSV = "positives.csv"
 SAMPLERATE = 44100
 CHUNK_DURATION = 0.5  # seconds
 FREQ_RANGE = (30, 80)
-TOLERANCE = 0.5  # seconds for matching detected vs. true
+TOLERANCE = 0  # seconds for matching detected vs. true
 THRESHOLDS = np.linspace(20, 100, 50)  # Magnitude thresholds to test
 
 # Frequency ranges to try: [(low1, high1), (low2, high2), ...]
@@ -20,6 +19,7 @@ FREQ_RANGES = [
     (0, 256),
     (0, 128),
     (0, 64),
+    (0, 80),
     (0, 32),
     (20, 60),
     (30, 60),
@@ -31,16 +31,19 @@ FREQ_RANGES = [
 # === Load ground truth ===
 gt = pd.read_csv(GROUND_TRUTH_CSV)
 
+
 def load_audio(filename):
     return librosa.load(os.path.join(AUDIO_FOLDER, filename), sr=SAMPLERATE)[0]
 
+
 def detect_cannon(chunk, freq_range, threshold, sr=SAMPLERATE):
     fft = np.fft.rfft(chunk)
-    freqs = np.fft.rfftfreq(len(chunk), 1/sr)
+    freqs = np.fft.rfftfreq(len(chunk), 1 / sr)
     magnitude = np.abs(fft)
     band = (freqs > freq_range[0]) & (freqs < freq_range[1])
     avg_mag = np.mean(magnitude[band])
     return avg_mag > threshold
+
 
 def match_timestamps(detected, truth, tolerance):
     matched = []
@@ -53,6 +56,7 @@ def match_timestamps(detected, truth, tolerance):
     fp = len(detected) - tp
     fn = len(truth) - tp
     return tp, fp, fn
+
 
 # === Main sweep loop ===
 results = []
@@ -67,7 +71,7 @@ for freq_range, threshold in product(FREQ_RANGES, THRESHOLDS):
         detected_times = []
 
         for i in range(0, len(y), chunk_size):
-            chunk = y[i:i+chunk_size]
+            chunk = y[i:i + chunk_size]
             if len(chunk) < chunk_size:
                 break
             if detect_cannon(chunk, freq_range, threshold):
@@ -96,7 +100,7 @@ for freq_range, threshold in product(FREQ_RANGES, THRESHOLDS):
 df = pd.DataFrame(results)
 best = df.sort_values(by="f1", ascending=False).iloc[0]
 
-print("\n🎯 Best Config (based on recall):")
+print(f"\n🎯 Best Config (based on f1, threshold {threshold}):")
 print(f"  Frequency band: {best.low_freq}–{best.high_freq} Hz")
 print(f"  Threshold:      {best.threshold:.1f}")
 print(f"  Precision:      {best.precision:.2f}")
@@ -106,3 +110,17 @@ print(f"  F1 Score:       {best.f1:.2f}")
 # === Save results to CSV
 df.to_csv("freq_band_tuning_results.csv", index=False)
 print("\n📄 Saved all results to freq_band_tuning_results.csv")
+
+# 🎯 Best Config (based on f1, 0.5 threshold):
+#   Frequency band: 30.0–60.0 Hz
+#   Threshold:      60.8
+#   Precision:      0.80
+#   Recall:         0.80
+#   F1 Score:       0.80
+
+# 🎯 Best Config (based on f1, 0 threshold):
+#   Frequency band: 0.0–64.0 Hz
+#   Threshold:      33.1
+#   Precision:      0.29
+#   Recall:         0.80
+#   F1 Score:       0.42
