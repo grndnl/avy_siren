@@ -13,8 +13,11 @@ OUTPUT_FILE = "detections.csv"
 SAMPLERATE = 44100
 CHUNK_DURATION = 0.5  # seconds
 THRESHOLD = 30
-MATCH_TOLERANCE = 0  # seconds to consider a true match
+MATCH_TOLERANCE = 0.5  # seconds to consider a true match
 LOW_FREQ_BAND = [0, 128]
+
+CLIP_THRESHOLD = 0.99  # threshold for float audio
+CLIP_COUNT_LIMIT = 20  # how many clipped samples = clipping
 
 # === Detection Functions ===
 
@@ -25,6 +28,11 @@ def detect_cannon(chunk, sr):
     low_band = (freqs > LOW_FREQ_BAND[0]) & (freqs < LOW_FREQ_BAND[1])
     avg_mag = np.mean(magnitude[low_band])
     return avg_mag > THRESHOLD
+
+# Clipping detection for a chunk
+def detect_clipping(chunk, threshold=CLIP_THRESHOLD, clip_count_limit=CLIP_COUNT_LIMIT):
+    clipped = np.abs(chunk) >= threshold
+    return np.sum(clipped) > clip_count_limit
 
 # === Process One File ===
 
@@ -40,6 +48,7 @@ def process_file(file_path):
             break
 
         if detect_cannon(chunk, sr):
+        # if detect_clipping(chunk):
             timestamp = round(i / sr, 2)
             detections.append(timestamp)
 
