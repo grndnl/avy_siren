@@ -12,9 +12,9 @@ GROUND_TRUTH_FILE = "positives.csv"
 OUTPUT_FILE = "detections.csv"
 SAMPLERATE = 44100
 CHUNK_DURATION = 0.5  # seconds
-THRESHOLD = 30
-MATCH_TOLERANCE = 0.5  # seconds to consider a true match
-LOW_FREQ_BAND = [0, 128]
+THRESHOLD = 20
+MATCH_TOLERANCE = 0  # seconds to consider a true match
+LOW_FREQ_BAND = [0, 80]
 
 CLIP_THRESHOLD = 0.99  # threshold for float audio
 CLIP_COUNT_LIMIT = 20  # how many clipped samples = clipping

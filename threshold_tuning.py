@@ -98,9 +98,9 @@ for freq_range, threshold in product(FREQ_RANGES, THRESHOLDS):
 
 # === Select the best result (based on recall or f1)
 df = pd.DataFrame(results)
-best = df.sort_values(by="f1", ascending=False).iloc[0]
+best = df.sort_values(by="recall", ascending=False).iloc[0]
 
-print(f"\n🎯 Best Config (based on f1):")
+print(f"\n🎯 Best Config (based on recall):")
 print(f"  Frequency band: {best.low_freq}–{best.high_freq} Hz")
 print(f"  Threshold:      {best.threshold:.1f}")
 print(f"  Precision:      {best.precision:.2f}")
@@ -114,6 +114,13 @@ print("\n📄 Saved all results to freq_band_tuning_results.csv")
 # 🎯 Best Config (based on f1):
 #   Frequency band: 0.0–128.0 Hz
 #   Threshold:      30.0
+#   Precision:      0.89
+#   Recall:         0.82
+#   F1 Score:       0.85
+
+# 🎯 Best Config (based on recall):
+#   Frequency band: 0.0–80.0 Hz
+#   Threshold:      20.0
 #   Precision:      0.89
 #   Recall:         0.82
 #   F1 Score:       0.85
