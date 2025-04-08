@@ -3,17 +3,18 @@ import librosa
 import numpy as np
 import csv
 import pandas as pd
-from sklearn.metrics import precision_score, recall_score, f1_score, classification_report, confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
+import time
 
 # Config
 AUDIO_FOLDER = "recordings"
 GROUND_TRUTH_FILE = "positives.csv"
 OUTPUT_FILE = "detections.csv"
 SAMPLERATE = 44100
-CHUNK_DURATION = 0.5  # seconds
+CHUNK_DURATION = 0.1  # seconds
 THRESHOLD = 20
-MATCH_TOLERANCE = 0  # seconds to consider a true match
+MATCH_TOLERANCE = 0.5  # seconds to consider a true match
 LOW_FREQ_BAND = [0, 80]
 
 CLIP_THRESHOLD = 0.99  # threshold for float audio
@@ -42,7 +43,11 @@ def process_file(file_path):
     chunk_size = int(CHUNK_DURATION * sr)
     detections = []
 
+    start_time = time.time()
+    iteration_times = []
+
     for i in range(0, len(y), chunk_size):
+        iteration_start = time.time()
         chunk = y[i:i+chunk_size]
         if len(chunk) < chunk_size:
             break
@@ -51,6 +56,11 @@ def process_file(file_path):
         # if detect_clipping(chunk):
             timestamp = round(i / sr, 2)
             detections.append(timestamp)
+
+        iteration_times.append(time.time() - iteration_start)
+
+    average_time = sum(iteration_times) / len(iteration_times) if iteration_times else 0
+    print(f"⏱️ Average time per iteration: {average_time:.5f} seconds")
 
     return detections
 
@@ -85,7 +95,7 @@ tp = fp = fn = 0
 all_detections = []
 
 for fname, detected in results.items():
-    detected = list(set(detected))  # Remove duplicates
+    # detected = set(detected))  # Remove duplicates
     truth = gt[gt["file_name"] == fname]["seconds"].tolist()
     truth_matched = [False] * len(truth)
 
@@ -151,9 +161,9 @@ print(classification_report(y_true, y_pred, target_names=["No Cannon", "Cannon"]
 
 # === Confusion Matrix ===
 
-cm = confusion_matrix(y_true, y_pred)
+cm = confusion_matrix(y_true, y_pred, normalize='true')
 disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["No Cannon", "Cannon"])
-disp.plot(cmap='Blues', values_format='d')
+disp.plot(cmap='Blues')
 plt.title("Confusion Matrix")
 plt.tight_layout()
 plt.savefig("confusion_matrix.png")
